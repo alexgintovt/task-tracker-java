@@ -34,7 +34,14 @@ class TaskTrackerCliTest {
 
         TaskTrackerCli.run(new String[]{"list"}, tasksFile, out(), err());
 
-        assertEquals("1|not_done|Read a book\r\n2|not_done|Write tests\r\n", output.toString());
+        String lineSeparator = System.lineSeparator();
+        String expected = "1|not_done|Read a book" + lineSeparator
+            + "2|not_done|Write tests" + lineSeparator;
+        String actual = output.toString();
+        printStringDiagnostics("Expected", expected);
+        printStringDiagnostics("Actual", actual);
+
+        assertEquals(expected, actual);
         assertEquals("", errors.toString());
     }
 
@@ -63,5 +70,17 @@ class TaskTrackerCliTest {
 
     private PrintStream err() {
         return new PrintStream(errors);
+    }
+
+    private void printStringDiagnostics(String label, String value) {
+        String escaped = value.replace("\\", "\\\\")
+                .replace("\r", "\\r")
+                .replace("\n", "\\n");
+        String characterCodes = value.chars()
+                .mapToObj(character -> String.format("U+%04X", character))
+                .toList()
+                .toString();
+        System.out.println(label + " string: " + escaped);
+        System.out.println(label + " character codes: " + characterCodes);
     }
 }
